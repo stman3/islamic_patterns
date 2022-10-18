@@ -1,0 +1,262 @@
+package islamicPattern;
+
+import org.lwjgl.*;
+import org.lwjgl.glfw.*;
+import org.lwjgl.opengl.*;
+import org.lwjgl.system.*;
+import java.nio.*;
+import static org.lwjgl.glfw.Callbacks.*;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryStack.*;
+import static org.lwjgl.system.MemoryUtil.*;
+
+public class CPCS391Proj {
+
+    // The window handle
+    private long window;
+    private int b = 1;
+    public void run() {
+        System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+
+        init();
+        loop();
+
+        // Free the window callbacks and destroy the window
+        glfwFreeCallbacks(window);
+        glfwDestroyWindow(window);
+
+        // Terminate GLFW and free the error callback
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
+    }
+
+    private void init() {
+        // Setup an error callback. The default implementation
+        // will print the error message in System.err.
+        GLFWErrorCallback.createPrint(System.err).set();
+
+        // Initialize GLFW. Most GLFW functions will not work before doing this.
+        if (!glfwInit()) {
+            throw new IllegalStateException("Unable to initialize GLFW");
+        }
+
+        // Configure GLFW
+        glfwDefaultWindowHints(); // optional, the current window hints are already the default
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+
+        // Create the window
+        window = glfwCreateWindow(600, 600, "IslamicPattern!", NULL, NULL);
+        if (window == NULL) {
+            throw new RuntimeException("Failed to create the GLFW window");
+        }
+
+        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
+        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+            }
+        });
+
+        // Get the thread stack and push a new frame
+        try (MemoryStack stack = stackPush()) {
+            IntBuffer pWidth = stack.mallocInt(1); // int*
+            IntBuffer pHeight = stack.mallocInt(1); // int*
+
+            // Get the window size passed to glfwCreateWindow
+            glfwGetWindowSize(window, pWidth, pHeight);
+
+            // Get the resolution of the primary monitor
+            GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+            // Center the window
+            glfwSetWindowPos(
+                    window,
+                    (vidmode.width() - pWidth.get(0)) / 2,
+                    (vidmode.height() - pHeight.get(0)) / 2
+            );
+        } // the stack frame is popped automatically
+
+        // Make the OpenGL context current
+        glfwMakeContextCurrent(window);
+        // Enable v-sync
+        glfwSwapInterval(1);
+
+        // Make the window visible
+        glfwShowWindow(window);
+    }
+
+    private void loop() {
+        // This line is critical for LWJGL's interoperation with GLFW's
+        // OpenGL context, or any context that is managed externally.
+        // LWJGL detects the context that is current in the current thread,
+        // creates the GLCapabilities instance and makes the OpenGL
+        // bindings available for use.
+        GL.createCapabilities();
+
+        // Set the clear color
+        // Run the rendering loop until the user has attempted to close
+        // the window or has pressed the ESCAPE key.
+        while (!glfwWindowShouldClose(window)) {
+            glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+
+            for (int i = 0; i <= 360;) {
+                drawOuterLine();
+                glRotatef(i, 0, 0, 1);
+                i += 45;
+            }
+            for (int i = 0; i <= 360;) {
+                drawInnerTrinOne();
+                glRotatef(i, 0, 0, 1);
+                i += 45;
+            }
+
+            for (int i = 0; i <= 360;) {
+                drawInnerTrinTwo();
+                glRotatef(i, 0, 0, 1);
+                i += 45;
+            }
+            for (int i = 0; i <= 360;) {
+                drawDots();
+                glRotatef(i, 0, 0, 1);
+                i += 45;
+            }
+            float incrmentshiftx = -0.85f;
+            float incrmentshifty = -0.85f;
+            for(int i=0;i<9;i++){
+                float x = 0.1f;
+                float y = 0.1f;
+                float incrment = 0.05f;
+                
+                for(int j=0;j<9;j++){
+                    if((incrmentshiftx<-0.44||incrmentshifty<-0.4)||(incrmentshiftx>0.38||incrmentshifty>0.5)){
+                    float shiftx = 0.0f+incrmentshiftx;
+                    float shifty = 0.0f+incrmentshifty;
+                    drawBackground(x,y,incrment,shiftx,shifty);
+                    }
+                    incrmentshiftx+=0.296f;
+
+                }
+              
+                incrmentshiftx = -0.85f;
+                incrmentshifty+=0.296f;
+               
+            }
+            System.out.println("incmentshiftx="+incrmentshiftx+"  incmentshifty="+incrmentshifty);
+            glfwSwapBuffers(window); // swap the color buffers
+            // Poll for window events. The key callback above will only be
+            // invoked during this call.
+            glfwPollEvents();
+        }
+    }
+
+    private void drawOuterLine() {
+        // create firs pattern ( outer)
+        glLineWidth(4);
+        glBegin(GL_LINE_STRIP);
+        {
+            glColor3d(0.5, 0.5, 0.5);
+            glVertex3f(0.36f, 0.04f, 0f);
+            glVertex3f(0.28f, 0.12f, 0f);
+            glVertex3f(0.28f, 0.24f, 0f);
+
+        }
+
+        glEnd();
+    }
+
+    private void drawInnerTrinOne() {
+        glBegin(GL_POLYGON);
+        {
+            glColor3d(0.5, 0.5, 0.5);
+            glVertex3f(0.25f, -0.08f, 0f);
+            glVertex3f(0.32f, 0f, 0f);
+            glVertex3f(0.25f, 0.08f, 0f);
+            glVertex3f(0.22f, 0f, 0f);
+
+        }
+
+        glEnd();
+    }
+
+    private void drawInnerTrinTwo() {
+        glBegin(GL_POLYGON);
+        {
+            glColor3d(0.5, 0.5, 0.5);
+            glVertex3f(0.01f, 0f, 0f);
+            glVertex3f(0.22f, -0.08f, 0f);
+            glVertex3f(0.2f, 0f, 0f);
+            glVertex3f(0.22f, 0.08f, 0f);
+
+        }
+
+        glEnd();
+    }
+
+    private void drawDots() {
+        glBegin(GL_POLYGON);
+        {
+
+            glColor3d(0.5, 0.5, 0.5);
+            glVertex3f(0.24f, 0.087f, 0f);
+            glVertex3f(0.25f, 0.097f, 0f);
+            glVertex3f(0.24f, 0.107f, 0f);
+            glVertex3f(0.23f, 0.097f, 0f);
+
+        }
+        glEnd();
+    }
+
+    private void drawBackground(float x,float y,float incrment,float shiftx,float shifty) {
+
+        glBegin(GL_LINE_STRIP);
+        {
+            glColor3d(0.5, 0.5, 0.5);
+            
+            
+            
+            
+            glVertex3f(-x+shiftx, y+shifty, 0f);
+            
+            //up
+            glVertex3f(-x/2+shiftx, y+shifty, 0f);
+            glVertex3f(0+shiftx, y+incrment+shifty, 0f);
+            glVertex3f(x/2+shiftx, y+shifty, 0f);
+            
+            glVertex3f(x+shiftx, y+shifty, 0f);
+
+            
+            //mid right
+            glVertex3f(x+shiftx, y/2+shifty, 0f);
+            glVertex3f(x+incrment+shiftx, 0+shifty, 0f);
+            glVertex3f(x+shiftx, -y/2+shifty, 0f);
+            
+            glVertex3f(+x+shiftx, -y+shifty, 0f);
+            
+            //down
+            glVertex3f(+x/2+shiftx, -y+shifty, 0f);
+            glVertex3f(0+shiftx, -(y+incrment)+shifty, 0f);
+            glVertex3f(-x/2+shiftx, -y+shifty, 0f);
+            
+            glVertex3f(-x+shiftx, -y+shifty, 0f);
+            
+            //mid left
+            glVertex3f(-x+shiftx, -y/2+shifty, 0f);
+            glVertex3f(-(x+incrment)+shiftx, 0.0f+shifty, 0f);
+            glVertex3f(-x+shiftx, y/2+shifty, 0f);
+
+            glVertex3f(-x+shiftx, y+shifty, 0f);
+        }
+        glEnd();
+      
+       
+    }
+
+    public static void main(String[] args) {
+        new CPCS391Proj().run();
+        
+    }
+}
