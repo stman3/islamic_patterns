@@ -100,12 +100,13 @@ public class CPCS391Proj {
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
-            glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+            glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
+            glScaled(1.3, 1.3, 1);
             for (int i = 0; i <= 360;) {
                 drawOuterLine();
                 glRotatef(i, 0, 0, 1);
@@ -115,6 +116,7 @@ public class CPCS391Proj {
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
+            glScaled(1.3, 1.3, 1);
             for (int i = 0; i <= 360;) {
                 drawInnerTrinOne();
                 glRotatef(i, 0, 0, 1);
@@ -124,6 +126,7 @@ public class CPCS391Proj {
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
+            glScaled(1.3, 1.3, 1);
             for (int i = 0; i <= 360;) {
                 drawInnerTrinTwo();
                 glRotatef(i, 0, 0, 1);
@@ -133,6 +136,7 @@ public class CPCS391Proj {
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
+            glScaled(1.3, 1.3, 1);
             for (int i = 0; i <= 360;) {
                 drawDots();
                 glRotatef(i, 0, 0, 1);
@@ -140,10 +144,12 @@ public class CPCS391Proj {
             }
             glPopMatrix();
             //-------------------------------------------
+
             float incrmentshiftx = -0.85f;
             float incrmentshifty = -0.85f;
             glLoadIdentity();
             glPushMatrix();
+            
             for (int i = 0; i < 7; i++) {
                 float x = 0.09f;
                 float y = 0.09f;
@@ -161,7 +167,7 @@ public class CPCS391Proj {
 
                 incrmentshiftx = -0.845f;
                 incrmentshifty += 0.283f;
-                
+
             }
             glScalef(0.5f, 0.5f, 1.0f);
             glPopMatrix();
@@ -186,11 +192,10 @@ public class CPCS391Proj {
         glLineWidth(4);
         glBegin(GL_LINE_STRIP);
         {
-            glColor3d(0.79, 0.58, 0.19);
+            glColor3d(0.89, 0.68, 0.29);
             glVertex3f(0.36f, 0.04f, 0f);
             glVertex3f(0.28f, 0.12f, 0f);
             glVertex3f(0.28f, 0.24f, 0f);
-
         }
         glEnd();
     }
@@ -200,7 +205,18 @@ public class CPCS391Proj {
 
         glBegin(GL_POLYGON);
         {
-            glColor3d(0.79, 0.58, 0.19);
+            glColor3d(0.7, 0.0, 0.0);
+            //glColor3d(0.99, 0.78, 0.39);
+            glVertex3f(0.25f, -0.08f, 0f);
+            glVertex3f(0.32f, 0f, 0f);
+            glVertex3f(0.25f, 0.08f, 0f);
+            glVertex3f(0.22f, 0f, 0f);
+        }
+        glBegin(GL_LINE_LOOP);
+        {
+            glColor3d(0.2, 0.0, 0.0);
+            // glColor3d(0.79, 0.58, 0.19);
+
             glVertex3f(0.25f, -0.08f, 0f);
             glVertex3f(0.32f, 0f, 0f);
             glVertex3f(0.25f, 0.08f, 0f);
@@ -215,6 +231,16 @@ public class CPCS391Proj {
     private void drawInnerTrinTwo() {
         glBegin(GL_POLYGON);
         {
+
+            glColor3d(0.89, 0.78, 0.39);
+            glVertex3f(0.01f, 0f, 0f);
+            glVertex3f(0.22f, -0.08f, 0f);
+            glVertex3f(0.2f, 0f, 0f);
+            glVertex3f(0.22f, 0.08f, 0f);
+
+        }
+        glBegin(GL_LINE_LOOP);
+        {
             glColor3d(0.79, 0.58, 0.19);
             glVertex3f(0.01f, 0f, 0f);
             glVertex3f(0.22f, -0.08f, 0f);
@@ -222,7 +248,6 @@ public class CPCS391Proj {
             glVertex3f(0.22f, 0.08f, 0f);
 
         }
-
         glEnd();
     }
     //----------------------------------------------------------------------------------------
@@ -238,63 +263,70 @@ public class CPCS391Proj {
             glVertex3f(0.23f, 0.097f, 0f);
 
         }
+        glBegin(GL_LINE_LOOP);
+        {
+
+            glColor3d(0.89, 0.78, 0.39);
+            glVertex3f(0.24f, 0.087f, 0f);
+            glVertex3f(0.25f, 0.097f, 0f);
+            glVertex3f(0.24f, 0.107f, 0f);
+            glVertex3f(0.23f, 0.097f, 0f);
+
+        }
         glEnd();
     }
     //----------------------------------------------------------------------------------------
 
     private void drawBackground(float x, float y, float incrment, float shiftx, float shifty) {
-        glLineWidth(2f);
-        glColor3d(0.91, 0.82, 0.61);
+        glLineWidth(3f);
+        glColor3d(0.79, 0.68, 0.29);
         glBegin(GL_LINE_STRIP);
         {
 
             glVertex3f(-x + shiftx, y + shifty, 0f);
-
             //up
             glVertex3f(-x / 2 + shiftx, y + shifty, 0f);
             glVertex3f(0 + shiftx, y + incrment + shifty, 0f);
             glVertex3f(x / 2 + shiftx, y + shifty, 0f);
             glVertex3f(x + shiftx, y + shifty, 0f);
-
             //mid right
             glVertex3f(x + shiftx, y / 2 + shifty, 0f);
             glVertex3f(x + incrment + shiftx, 0 + shifty, 0f);
             glVertex3f(x + shiftx, -y / 2 + shifty, 0f);
 
             glVertex3f(+x + shiftx, -y + shifty, 0f);
-
             //down
             glVertex3f(+x / 2 + shiftx, -y + shifty, 0f);
             glVertex3f(0 + shiftx, -(y + incrment) + shifty, 0f);
             glVertex3f(-x / 2 + shiftx, -y + shifty, 0f);
 
             glVertex3f(-x + shiftx, -y + shifty, 0f);
-
             //mid left
             glVertex3f(-x + shiftx, -y / 2 + shifty, 0f);
             glVertex3f(-(x + incrment) + shiftx, 0.0f + shifty, 0f);
             glVertex3f(-x + shiftx, y / 2 + shifty, 0f);
-
             glVertex3f(-x + shiftx, y + shifty, 0f);
         }
-        
+
         glEnd();
 
     }
 
     //----------------------------------------------------------------------------------------
     private void drawBackBox() {
-        glLineWidth(3f);
+        glLineWidth(4f);
         glBegin(GL_LINE_LOOP);
         {
 
             glColor3d(0.79, 0.58, 0.19);
             glVertex3f(0.69f, -0.69f, 0f);
             glVertex3f(0.69f, 0.69f, 0f);
+            glColor3d(0.39, 0.28, 0.09);
             glVertex3f(-0.685f, 0.69f, 0f);
             glVertex3f(-0.685f, -0.69f, 0f);
 
         }
+
         glEnd();
     }
 
