@@ -16,6 +16,7 @@ public class CPCS391Proj {
     // The window handle
     private long window;
     private int b = 1;
+
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
@@ -102,50 +103,76 @@ public class CPCS391Proj {
             glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
+            //-------------------------------------------
+            glLoadIdentity();
+            glPushMatrix();
             for (int i = 0; i <= 360;) {
                 drawOuterLine();
                 glRotatef(i, 0, 0, 1);
                 i += 45;
             }
+            glPopMatrix();
+            //-------------------------------------------
+            glLoadIdentity();
+            glPushMatrix();
             for (int i = 0; i <= 360;) {
                 drawInnerTrinOne();
                 glRotatef(i, 0, 0, 1);
                 i += 45;
             }
-
+            glPopMatrix();
+            //-------------------------------------------
+            glLoadIdentity();
+            glPushMatrix();
             for (int i = 0; i <= 360;) {
                 drawInnerTrinTwo();
                 glRotatef(i, 0, 0, 1);
                 i += 45;
             }
+            glPopMatrix();
+            //-------------------------------------------
+            glLoadIdentity();
+            glPushMatrix();
             for (int i = 0; i <= 360;) {
                 drawDots();
                 glRotatef(i, 0, 0, 1);
                 i += 45;
             }
+            glPopMatrix();
+            //-------------------------------------------
             float incrmentshiftx = -0.85f;
             float incrmentshifty = -0.85f;
-            for(int i=0;i<9;i++){
-                float x = 0.1f;
-                float y = 0.1f;
+            glLoadIdentity();
+            glPushMatrix();
+            for (int i = 0; i < 7; i++) {
+                float x = 0.09f;
+                float y = 0.09f;
                 float incrment = 0.05f;
-                
-                for(int j=0;j<9;j++){
-                    if((incrmentshiftx<-0.44||incrmentshifty<-0.4)||(incrmentshiftx>0.38||incrmentshifty>0.5)){
-                    float shiftx = 0.0f+incrmentshiftx;
-                    float shifty = 0.0f+incrmentshifty;
-                    drawBackground(x,y,incrment,shiftx,shifty);
+
+                for (int j = 0; j < 7; j++) {
+                    if ((incrmentshiftx < -0.7 || incrmentshifty < -0.8) || (incrmentshiftx > 0.7 || incrmentshifty > 0.8)) {
+                        float shiftx = 0.0f + incrmentshiftx;
+                        float shifty = 0.0f + incrmentshifty;
+                        drawBackground(x, y, incrment, shiftx, shifty);
                     }
-                    incrmentshiftx+=0.296f;
+                    incrmentshiftx += 0.283f;
 
                 }
-              
-                incrmentshiftx = -0.85f;
-                incrmentshifty+=0.296f;
-               
+
+                incrmentshiftx = -0.845f;
+                incrmentshifty += 0.283f;
+                
             }
-            System.out.println("incmentshiftx="+incrmentshiftx+"  incmentshifty="+incrmentshifty);
+            glScalef(0.5f, 0.5f, 1.0f);
+            glPopMatrix();
+            //-------------------------------------------
+            glLoadIdentity();
+            glPushMatrix();
+
+            drawBackBox();
+
+            glPopMatrix();
+
             glfwSwapBuffers(window); // swap the color buffers
             // Poll for window events. The key callback above will only be
             // invoked during this call.
@@ -153,6 +180,7 @@ public class CPCS391Proj {
         }
     }
 
+    //----------------------------------------------------------------------------------------
     private void drawOuterLine() {
         // create firs pattern ( outer)
         glLineWidth(4);
@@ -164,11 +192,12 @@ public class CPCS391Proj {
             glVertex3f(0.28f, 0.24f, 0f);
 
         }
-
         glEnd();
     }
+    //----------------------------------------------------------------------------------------
 
     private void drawInnerTrinOne() {
+
         glBegin(GL_POLYGON);
         {
             glColor3d(0.5, 0.5, 0.5);
@@ -181,6 +210,7 @@ public class CPCS391Proj {
 
         glEnd();
     }
+    //----------------------------------------------------------------------------------------
 
     private void drawInnerTrinTwo() {
         glBegin(GL_POLYGON);
@@ -195,6 +225,7 @@ public class CPCS391Proj {
 
         glEnd();
     }
+    //----------------------------------------------------------------------------------------
 
     private void drawDots() {
         glBegin(GL_POLYGON);
@@ -209,54 +240,66 @@ public class CPCS391Proj {
         }
         glEnd();
     }
+    //----------------------------------------------------------------------------------------
 
-    private void drawBackground(float x,float y,float incrment,float shiftx,float shifty) {
-
+    private void drawBackground(float x, float y, float incrment, float shiftx, float shifty) {
+        glLineWidth(2f);
         glBegin(GL_LINE_STRIP);
         {
             glColor3d(0.5, 0.5, 0.5);
-            
-            
-            
-            
-            glVertex3f(-x+shiftx, y+shifty, 0f);
-            
+
+            glVertex3f(-x + shiftx, y + shifty, 0f);
+
             //up
-            glVertex3f(-x/2+shiftx, y+shifty, 0f);
-            glVertex3f(0+shiftx, y+incrment+shifty, 0f);
-            glVertex3f(x/2+shiftx, y+shifty, 0f);
-            
-            glVertex3f(x+shiftx, y+shifty, 0f);
+            glVertex3f(-x / 2 + shiftx, y + shifty, 0f);
+            glVertex3f(0 + shiftx, y + incrment + shifty, 0f);
+            glVertex3f(x / 2 + shiftx, y + shifty, 0f);
+            glVertex3f(x + shiftx, y + shifty, 0f);
 
-            
             //mid right
-            glVertex3f(x+shiftx, y/2+shifty, 0f);
-            glVertex3f(x+incrment+shiftx, 0+shifty, 0f);
-            glVertex3f(x+shiftx, -y/2+shifty, 0f);
-            
-            glVertex3f(+x+shiftx, -y+shifty, 0f);
-            
-            //down
-            glVertex3f(+x/2+shiftx, -y+shifty, 0f);
-            glVertex3f(0+shiftx, -(y+incrment)+shifty, 0f);
-            glVertex3f(-x/2+shiftx, -y+shifty, 0f);
-            
-            glVertex3f(-x+shiftx, -y+shifty, 0f);
-            
-            //mid left
-            glVertex3f(-x+shiftx, -y/2+shifty, 0f);
-            glVertex3f(-(x+incrment)+shiftx, 0.0f+shifty, 0f);
-            glVertex3f(-x+shiftx, y/2+shifty, 0f);
+            glVertex3f(x + shiftx, y / 2 + shifty, 0f);
+            glVertex3f(x + incrment + shiftx, 0 + shifty, 0f);
+            glVertex3f(x + shiftx, -y / 2 + shifty, 0f);
 
-            glVertex3f(-x+shiftx, y+shifty, 0f);
+            glVertex3f(+x + shiftx, -y + shifty, 0f);
+
+            //down
+            glVertex3f(+x / 2 + shiftx, -y + shifty, 0f);
+            glVertex3f(0 + shiftx, -(y + incrment) + shifty, 0f);
+            glVertex3f(-x / 2 + shiftx, -y + shifty, 0f);
+
+            glVertex3f(-x + shiftx, -y + shifty, 0f);
+
+            //mid left
+            glVertex3f(-x + shiftx, -y / 2 + shifty, 0f);
+            glVertex3f(-(x + incrment) + shiftx, 0.0f + shifty, 0f);
+            glVertex3f(-x + shiftx, y / 2 + shifty, 0f);
+
+            glVertex3f(-x + shiftx, y + shifty, 0f);
+        }
+        
+        glEnd();
+
+    }
+
+    //----------------------------------------------------------------------------------------
+    private void drawBackBox() {
+        glLineWidth(3f);
+        glBegin(GL_LINE_LOOP);
+        {
+
+            glColor3d(0.5, 0.5, 0.5);
+            glVertex3f(0.69f, -0.69f, 0f);
+            glVertex3f(0.69f, 0.69f, 0f);
+            glVertex3f(-0.685f, 0.69f, 0f);
+            glVertex3f(-0.685f, -0.69f, 0f);
+
         }
         glEnd();
-      
-       
     }
 
     public static void main(String[] args) {
         new CPCS391Proj().run();
-        
+
     }
 }
