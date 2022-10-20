@@ -319,11 +319,11 @@ public class CPCS391Proj {
         {
 
             glColor3d(0.79, 0.58, 0.19);
-            glVertex3f(0.69f, -0.69f, 0f);
-            glVertex3f(0.69f, 0.69f, 0f);
+            glVertex3f(0.675f, -0.675f, 0f);
+            glVertex3f(0.675f, 0.675f, 0f);
             glColor3d(0.39, 0.28, 0.09);
-            glVertex3f(-0.685f, 0.69f, 0f);
-            glVertex3f(-0.685f, -0.69f, 0f);
+            glVertex3f(-0.675f, 0.67f, 0f);
+            glVertex3f(-0.675f, -0.675f, 0f);
 
         }
 
