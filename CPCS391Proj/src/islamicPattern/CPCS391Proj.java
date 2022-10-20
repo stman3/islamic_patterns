@@ -16,6 +16,8 @@ public class CPCS391Proj {
     // The window handle
     private long window;
     private int b = 1;
+    private float sp = 0.0f;
+    private boolean flagRev = false;
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -101,17 +103,19 @@ public class CPCS391Proj {
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
             glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
             glScaled(1.3, 1.3, 1);
+
             for (int i = 0; i <= 360;) {
+                update();
                 drawOuterLine();
                 glRotatef(i, 0, 0, 1);
                 i += 45;
             }
+            glRotatef(25, 0, 0, 1);
             glPopMatrix();
             //-------------------------------------------
             glLoadIdentity();
@@ -126,6 +130,7 @@ public class CPCS391Proj {
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
+
             glScaled(1.3, 1.3, 1);
             for (int i = 0; i <= 360;) {
                 drawInnerTrinTwo();
@@ -149,7 +154,7 @@ public class CPCS391Proj {
             float incrmentshifty = -0.85f;
             glLoadIdentity();
             glPushMatrix();
-            
+
             for (int i = 0; i < 7; i++) {
                 float x = 0.09f;
                 float y = 0.09f;
@@ -169,7 +174,6 @@ public class CPCS391Proj {
                 incrmentshifty += 0.283f;
 
             }
-            glScalef(0.5f, 0.5f, 1.0f);
             glPopMatrix();
             //-------------------------------------------
             glLoadIdentity();
@@ -186,6 +190,17 @@ public class CPCS391Proj {
         }
     }
 
+    //----------------------------------------
+    private void update() {
+        if (flagRev == false) {
+            sp = sp + 0.001f;
+        } else {
+            sp = sp - 0.001f;
+        }
+        System.out.println(sp);
+
+    }
+
     //----------------------------------------------------------------------------------------
     private void drawOuterLine() {
         // create firs pattern ( outer)
@@ -193,9 +208,15 @@ public class CPCS391Proj {
         glBegin(GL_LINE_STRIP);
         {
             glColor3d(0.89, 0.68, 0.29);
-            glVertex3f(0.36f, 0.04f, 0f);
-            glVertex3f(0.28f, 0.12f, 0f);
-            glVertex3f(0.28f, 0.24f, 0f);
+            if (sp > 0.1f) {
+                flagRev = true;
+            } else if (sp < 0.0f) {
+                flagRev = false;
+            }
+            glVertex3f(0.36f + sp, 0.04f , 0f);
+            glVertex3f(0.28f + sp, 0.12f , 0f);
+            glVertex3f(0.28f + sp, 0.24f , 0f);
+
         }
         glEnd();
     }
@@ -319,11 +340,11 @@ public class CPCS391Proj {
         {
 
             glColor3d(0.79, 0.58, 0.19);
-            glVertex3f(0.69f, -0.69f, 0f);
-            glVertex3f(0.69f, 0.69f, 0f);
+            glVertex3f(0.675f, -0.675f, 0f);
+            glVertex3f(0.675f, 0.675f, 0f);
             glColor3d(0.39, 0.28, 0.09);
-            glVertex3f(-0.685f, 0.69f, 0f);
-            glVertex3f(-0.685f, -0.69f, 0f);
+            glVertex3f(-0.675f, 0.675f, 0f);
+            glVertex3f(-0.675f, -0.675f, 0f);
 
         }
 
