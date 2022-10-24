@@ -15,7 +15,6 @@ public class CPCS391Proj {
 
     // The window handle
     private long window;
-    private int b = 1;
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
@@ -61,7 +60,7 @@ public class CPCS391Proj {
         });
 
         // Get the thread stack and push a new frame
-        try (MemoryStack stack = stackPush()) {
+        try ( MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1); // int*
             IntBuffer pHeight = stack.mallocInt(1); // int*
 
@@ -101,24 +100,27 @@ public class CPCS391Proj {
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
             glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
             //-------------------------------------------
             glLoadIdentity();
-            glPushMatrix();
             glScaled(1.3, 1.3, 1);
             for (int i = 0; i <= 360;) {
                 drawOuterLine();
                 glRotatef(i, 0, 0, 1);
                 i += 45;
             }
+            glRotatef(25, 0, 0, 1);
             glPopMatrix();
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
             glScaled(1.3, 1.3, 1);
             for (int i = 0; i <= 360;) {
-                drawInnerTrinOne();
+                if (i % 2 == 0) {
+                    drawInnerTrinOne(0.7f, 0, 0);
+                } else {
+                    drawInnerTrinOne(0.7f, 0, 0);
+                }
                 glRotatef(i, 0, 0, 1);
                 i += 45;
             }
@@ -126,6 +128,7 @@ public class CPCS391Proj {
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
+
             glScaled(1.3, 1.3, 1);
             for (int i = 0; i <= 360;) {
                 drawInnerTrinTwo();
@@ -149,7 +152,7 @@ public class CPCS391Proj {
             float incrmentshifty = -0.85f;
             glLoadIdentity();
             glPushMatrix();
-            
+
             for (int i = 0; i < 7; i++) {
                 float x = 0.09f;
                 float y = 0.09f;
@@ -169,7 +172,6 @@ public class CPCS391Proj {
                 incrmentshifty += 0.283f;
 
             }
-            glScalef(0.5f, 0.5f, 1.0f);
             glPopMatrix();
             //-------------------------------------------
             glLoadIdentity();
@@ -183,29 +185,38 @@ public class CPCS391Proj {
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents();
+            update();
         }
+    }
+
+    //----------------------------------------
+    private void update() {
+
     }
 
     //----------------------------------------------------------------------------------------
     private void drawOuterLine() {
         // create firs pattern ( outer)
         glLineWidth(4);
+        glPushMatrix();
         glBegin(GL_LINE_STRIP);
         {
             glColor3d(0.89, 0.68, 0.29);
-            glVertex3f(0.36f, 0.04f, 0f);
-            glVertex3f(0.28f, 0.12f, 0f);
-            glVertex3f(0.28f, 0.24f, 0f);
+            glVertex3f(0.36f, 0.04f , 0f);
+            glVertex3f(0.28f, 0.12f , 0f);
+            glVertex3f(0.28f, 0.24f , 0f);
+
         }
         glEnd();
+        glPopMatrix();
     }
     //----------------------------------------------------------------------------------------
 
-    private void drawInnerTrinOne() {
-
+    private void drawInnerTrinOne(float red, float green, float blue) {
+        glPushMatrix();
         glBegin(GL_POLYGON);
         {
-            glColor3d(0.7, 0.0, 0.0);
+            glColor3d(red, green, blue);
             //glColor3d(0.99, 0.78, 0.39);
             glVertex3f(0.25f, -0.08f, 0f);
             glVertex3f(0.32f, 0f, 0f);
@@ -214,17 +225,16 @@ public class CPCS391Proj {
         }
         glBegin(GL_LINE_LOOP);
         {
-            glColor3d(0.2, 0.0, 0.0);
-            // glColor3d(0.79, 0.58, 0.19);
-
+            glColor3d(0.2, 0, 0);
+            //glColor3d(0.79, 0.58, 0.19);
             glVertex3f(0.25f, -0.08f, 0f);
             glVertex3f(0.32f, 0f, 0f);
             glVertex3f(0.25f, 0.08f, 0f);
             glVertex3f(0.22f, 0f, 0f);
 
         }
-
         glEnd();
+        glPopMatrix();
     }
     //----------------------------------------------------------------------------------------
 
@@ -253,6 +263,7 @@ public class CPCS391Proj {
     //----------------------------------------------------------------------------------------
 
     private void drawDots() {
+        glPushMatrix();
         glBegin(GL_POLYGON);
         {
 
@@ -274,6 +285,7 @@ public class CPCS391Proj {
 
         }
         glEnd();
+        glPopMatrix();
     }
     //----------------------------------------------------------------------------------------
 
@@ -322,16 +334,14 @@ public class CPCS391Proj {
             glVertex3f(0.675f, -0.675f, 0f);
             glVertex3f(0.675f, 0.675f, 0f);
             glColor3d(0.39, 0.28, 0.09);
-            glVertex3f(-0.675f, 0.67f, 0f);
+            glVertex3f(-0.675f, 0.675f, 0f);
             glVertex3f(-0.675f, -0.675f, 0f);
-
         }
-
+        
         glEnd();
     }
 
     public static void main(String[] args) {
         new CPCS391Proj().run();
-
     }
 }
