@@ -5,6 +5,8 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 import java.nio.*;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -15,19 +17,28 @@ public class Animation2 {
 
     // The window handle
     private long window;
-    private float sp = 0.0f;
-    private float xRotate = 0.0f;
-    private float yRotate = 0.0f;
-    private float zRotate = 0.0f;
-    private boolean zRotateFlagRev = false;
-    private boolean flagRev = false;
+    private float innerRotateDegree = 0.0f;
+    private float outerRotateDegree = 0.0f;
+    private int phase = 1;
+    private float subtractValue = 0.0005f;
+    private float scalingDownFactor = 1f;
+    private float scaleUpFactor = 1f;
+    private float translateYFactor = 0f;
+    private float flippingDegree = 0f;
+    HashMap<String, Float> outerLineData = new HashMap<String, Float>();
+    HashMap<String, Float> innerTrinOneData = new HashMap<String, Float>();
+    HashMap<String, Float> innerTrinTwoData = new HashMap<String, Float>();
+    HashMap<String, Float> dotsData = new HashMap<String, Float>();
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
         init();
+        initOuterLineData();
+        initInnerTrinOneData();
+        initInnerTrinTwoData();
+        initDotsData();
         loop();
-
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(window);
         glfwDestroyWindow(window);
@@ -66,7 +77,7 @@ public class Animation2 {
         });
 
         // Get the thread stack and push a new frame
-        try ( MemoryStack stack = stackPush()) {
+        try (MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1); // int*
             IntBuffer pHeight = stack.mallocInt(1); // int*
 
@@ -100,7 +111,6 @@ public class Animation2 {
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities();
-
         // Set the clear color
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
@@ -110,35 +120,31 @@ public class Animation2 {
             //-------------------------------------------
             glLoadIdentity();
             glScaled(1.3, 1.3, 1);
-            for (int i = 0; i <= 360;) {
-                drawOuterLine();
-                glRotatef(i, 0, 0, 1);
-                i += 45;
-            }
-            glRotatef(25, 0, 0, 1);
-            glPopMatrix();
-            //-------------------------------------------
-            glLoadIdentity();
-            glPushMatrix();
-            glScaled(1.3, 1.3, 1);
-            for (int i = 0; i <= 360;) {
-                if (i % 2 == 0) {
-                    drawInnerTrinOne(0.7f, 0, 0);
-                } else {
-                    drawInnerTrinOne(0.7f, 0, 0);
-                }
-                glRotatef(i, 0, 0, 1);
-                i += 45;
-            }
-            glPopMatrix();
-            //-------------------------------------------
-            glLoadIdentity();
-            glPushMatrix();
+            float x1 = outerLineData.get("x1");
+            float y1 = outerLineData.get("y1");
+            float x2 = outerLineData.get("x2");
+            float y2 = outerLineData.get("y2");
+            float x3 = outerLineData.get("x3");
+            float y3 = outerLineData.get("y3");
+            float degree = outerLineData.get("degree");
+            glRotatef(-outerRotateDegree, 0, 0, 1);
 
+            for (int i = 0; i <= 8; i++) {
+                glRotatef(i * degree, 0, 0, 1);
+                drawOuterLine(x1, y1, x2, y2, x3, y3);
+            }
+            glPopMatrix();
+
+            //-------------------------------------------
+            glLoadIdentity();
+            glPushMatrix();
             glScaled(1.3, 1.3, 1);
+            glRotatef(-innerRotateDegree, 0, 0, 1);
+            glScalef(scalingDownFactor, scalingDownFactor, 0);
             for (int i = 0; i <= 360;) {
-                drawInnerTrinTwo();
                 glRotatef(i, 0, 0, 1);
+                drawInnerTrinTwo();
+
                 i += 45;
             }
             glPopMatrix();
@@ -146,9 +152,44 @@ public class Animation2 {
             glLoadIdentity();
             glPushMatrix();
             glScaled(1.3, 1.3, 1);
+
+            // scaleDownAndTranslate();
+            x1 = innerTrinOneData.get("x1");
+            y1 = innerTrinOneData.get("y1");
+            x2 = innerTrinOneData.get("x2");
+            y2 = innerTrinOneData.get("y2");
+            x3 = innerTrinOneData.get("x3");
+            y3 = innerTrinOneData.get("y3");
+            float x4 = innerTrinOneData.get("x4");
+            float y4 = innerTrinOneData.get("y4");
+            degree = innerTrinOneData.get("degree");
+            glRotatef(innerRotateDegree, 0, 0, 1);
+
             for (int i = 0; i <= 360;) {
-                drawDots();
                 glRotatef(i, 0, 0, 1);
+                drawInnerTrinOne(0.7f, 0, 0, x1, y1, x2, y2, x3, y3, x4, y4);
+                i += 45;
+            }
+            glPopMatrix();
+            //-------------------------------------------
+            glLoadIdentity();
+            glPushMatrix();
+            glScaled(1.3, 1.3, 1);
+            //  scaleDownAndTranslate();
+            x1 = dotsData.get("x1");
+            y1 = dotsData.get("y1");
+            x2 = dotsData.get("x2");
+            y2 = dotsData.get("y2");
+            x3 = dotsData.get("x3");
+            y3 = dotsData.get("y3");
+            x4 = dotsData.get("x4");
+            y4 = dotsData.get("y4");
+            glScalef(scaleUpFactor, scaleUpFactor, 0);
+            glRotatef(-outerRotateDegree, 0, 0, 1);
+
+            for (int i = 0; i <= 360;) {
+                glRotatef(i, 0, 0, 1);
+                drawDots(x1, y1, x2, y2, x3, y3, x4, y4);
                 i += 45;
             }
             glPopMatrix();
@@ -168,7 +209,7 @@ public class Animation2 {
                     if ((incrmentshiftx < -0.7 || incrmentshifty < -0.8) || (incrmentshiftx > 0.7 || incrmentshifty > 0.8)) {
                         float shiftx = 0.0f + incrmentshiftx;
                         float shifty = 0.0f + incrmentshifty;
-                        drawBackground(x, y, incrment, shiftx, shifty);
+                        //drawBackground(x, y, incrment, shiftx, shifty);
                     }
                     incrmentshiftx += 0.283f;
 
@@ -180,57 +221,103 @@ public class Animation2 {
             }
             glPopMatrix();
             //-------------------------------------------
+
             glLoadIdentity();
             glPushMatrix();
 
             drawBackBox();
-
             glPopMatrix();
 
             glfwSwapBuffers(window); // swap the color buffers
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents();
-            update();
+
+            updateValues();
+        }
+    }
+
+    private void updateValues() {
+        checkPhase();
+        if (phase == 1) {
+            updateOuterLineData();
+            updateDotsData();
+            scaleUpFactor = scaleUpFactor < 1.6f ? scaleUpFactor + 0.0009f : scaleUpFactor;
+            outerRotateDegree += 0.2f;
+
+
+        } else if (phase == 2) {
+            updateInnerTrinOneData();
+            updateInnerTrinTwoData();
+            scalingDownFactor = scalingDownFactor > 0.0f ? scalingDownFactor - 0.002f : scalingDownFactor;
+            innerRotateDegree += 0.2f;
+        } else if(phase == 3){
+            
+        }
+
+    }
+
+    private void checkPhase() {
+        if (outerLineData.get("x2") > 0.48f && outerLineData.get("y1") < -0.03229f & phase == 1 ){
+            phase++;
+        } else if ( innerTrinTwoData.get("x4") < 0.015f && phase == 1 && phase == 2) {
+            phase++;
         }
     }
 
     //----------------------------------------
-    private void update() {
-        xRotate += 2;
-        yRotate += 2;
+    private void updateOuterLineData() {
+        outerLineData.forEach((key, v) -> {
+            if (key.equals("x2")) {
+                outerLineData.put(key, v.floatValue() < 0.48f ? v + subtractValue : v);
+            } else if (key.equals("y1")) {
+                outerLineData.put(key, v.floatValue() > -0.03229f ? v - subtractValue : v);
 
-        if (!zRotateFlagRev) {
-            zRotate += 3.0f;
-        } else {
-            zRotate -= 3.0f;
-        }
-        if (!flagRev) {
-            sp += 0.001f;
-        } else {
-            sp -= 0.001f;
-        }
-        System.out.printf("sp=%f, zRotate=%f\n", sp, zRotate);
+            }
+        });
+        System.out.println(outerLineData);
+
+    }
+
+    private void updateInnerTrinOneData() {
+        innerTrinOneData.forEach((key, v) -> {
+            if (key.equals("x4")) {
+                innerTrinOneData.put(key, v.floatValue() > 0.015f ? v - subtractValue : v);
+            }
+
+        });
+
+    }
+
+    private void updateInnerTrinTwoData() {
+        innerTrinTwoData.forEach((key, v) -> {
+            if (key.equals("x4")) {
+                innerTrinTwoData.put(key, v.floatValue() > 0.015f ? v - subtractValue : v);
+            }
+
+        });
+    }
+
+    private void updateDotsData() {
+        dotsData.forEach((key, v) -> {
+            if (key.equals("x2") || key.equals("x4") || key.equals("x1") || key.equals("x3")) {
+                dotsData.put(key, v.floatValue() < 0.3f ? v + subtractValue : v);
+            }
+        });
 
     }
 
     //----------------------------------------------------------------------------------------
-    private void drawOuterLine() {
-        // create firs pattern (outer)
-        if (sp > 0.1f) {
-            flagRev = true;
-        } else if (sp < 0.0f) {
-            flagRev = false;
-        }
+    private void drawOuterLine(float x1, float y1, float x2, float y2, float x3, float y3) {
+        // create firs pattern ( outer)
         glLineWidth(4);
         glPushMatrix();
-        //glTranslated(sp, 0, 0);
         glBegin(GL_LINE_STRIP);
         {
             glColor3d(0.89, 0.68, 0.29);
-            glVertex3f(0.36f, 0.04f , 0f);
-            glVertex3f(0.28f + sp, 0.12f + sp , 0f);
-            glVertex3f(0.28f, 0.24f , 0f);
+            glVertex3f(x1, y1, 0f);
+            glVertex3f(x2, y2, 0f);
+            glVertex3f(x3, y3, 0f);
 
         }
         glEnd();
@@ -238,33 +325,28 @@ public class Animation2 {
     }
     //----------------------------------------------------------------------------------------
 
-    private void drawInnerTrinOne(float red, float green, float blue) {
+    private void drawInnerTrinOne(float red, float green, float blue, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
         glPushMatrix();
-        //glRotatef(xRotate, 1, 0, 0);
-        //glRotatef(yRotate, 0, 1, 0);
-        //glRotatef(zRotate, 0, 0, 1);
-        if (zRotate > 360f) {
-            zRotateFlagRev = true;
-        } else if (zRotate < 0.0f) {
-            zRotateFlagRev = false;
+        if (y1 > -0.18f && y3 < 0.18f) {
+            glRotatef(0, 0, 0, 360);
         }
         glBegin(GL_POLYGON);
         {
             glColor3d(red, green, blue);
             //glColor3d(0.99, 0.78, 0.39);
-            glVertex3f(0.25f, -0.08f, 0f);
-            glVertex3f(0.32f, 0f, 0f);
-            glVertex3f(0.25f, 0.08f, 0f);
-            glVertex3f(0.22f, 0f, 0f);
+            glVertex3f(x1, y1, 0f);
+            glVertex3f(x2, y2, 0f);
+            glVertex3f(x3, y3, 0f);
+            glVertex3f(x4, y4, 0f);
+
         }
         glBegin(GL_LINE_LOOP);
         {
             glColor3d(0.2, 0, 0);
-            //glColor3d(0.79, 0.58, 0.19);
-            glVertex3f(0.25f, -0.08f, 0f);
-            glVertex3f(0.32f, 0f, 0f);
-            glVertex3f(0.25f, 0.08f, 0f);
-            glVertex3f(0.22f, 0f, 0f);
+            glVertex3f(x1, y1, 0f);
+            glVertex3f(x2, y2, 0f);
+            glVertex3f(x3, y3, 0f);
+            glVertex3f(x4, y4, 0f);
 
         }
         glEnd();
@@ -273,6 +355,8 @@ public class Animation2 {
     //----------------------------------------------------------------------------------------
 
     private void drawInnerTrinTwo() {
+        glPushMatrix();
+        glRotatef(flippingDegree, 0, 0, 1);
         glBegin(GL_POLYGON);
         {
 
@@ -293,32 +377,30 @@ public class Animation2 {
 
         }
         glEnd();
+        glPopMatrix();
     }
     //----------------------------------------------------------------------------------------
 
-    private void drawDots() {
+    private void drawDots(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
         glPushMatrix();
-        //glRotatef(zRotate, 0, 0, 1);
-        glTranslatef(sp, sp, 0);
         glBegin(GL_POLYGON);
         {
 
-            glColor3d(0.79, 0.58, 0.19);
-            glVertex3f(0.24f, 0.087f, 0f);
-            glVertex3f(0.25f, 0.097f, 0f);
-            glVertex3f(0.24f, 0.107f, 0f);
-            glVertex3f(0.23f, 0.097f, 0f);
+            glColor3d(0.79, 0.68, 0.29);
+            glVertex3f(x1, y1, 0f);
+            glVertex3f(x2, y2, 0f);
+            glVertex3f(x3, y3, 0f);
+            glVertex3f(x4, y4, 0f);
 
         }
         glBegin(GL_LINE_LOOP);
         {
 
-            glColor3d(0.89, 0.78, 0.39);
-            glVertex3f(0.24f, 0.087f, 0f);
-            glVertex3f(0.25f, 0.097f, 0f);
-            glVertex3f(0.24f, 0.107f, 0f);
-            glVertex3f(0.23f, 0.097f, 0f);
-
+            glColor3d(0.79, 0.68, 0.29);
+            glVertex3f(x1, y1, 0f);
+            glVertex3f(x2, y2, 0f);
+            glVertex3f(x3, y3, 0f);
+            glVertex3f(x4, y4, 0f);
         }
         glEnd();
         glPopMatrix();
@@ -374,12 +456,67 @@ public class Animation2 {
             glVertex3f(-0.675f, -0.675f, 0f);
 
         }
-        
+
         glEnd();
     }
 
     public static void main(String[] args) {
         new Animation2().run();
+    }
+
+    private void initOuterLineData() {
+        outerLineData.put("x1", 0.36f);
+        outerLineData.put("y1", 0.04f);
+        outerLineData.put("x2", 0.28f);
+        outerLineData.put("y2", 0.12f);
+        outerLineData.put("x3", 0.28f);
+        outerLineData.put("y3", 0.24f);
+        outerLineData.put("degree", 45f);
+    }
+
+    private void initInnerTrinOneData() {
+        innerTrinOneData.put("x1", 0.25f);
+        innerTrinOneData.put("y1", -0.08f);
+        innerTrinOneData.put("x2", 0.32f);
+        innerTrinOneData.put("y2", 0f);
+        innerTrinOneData.put("x3", 0.25f);
+        innerTrinOneData.put("y3", 0.08f);
+        innerTrinOneData.put("x4", 0.22f);
+        innerTrinOneData.put("y4", 0.0f);
+        innerTrinOneData.put("degree", 45f);
+    }
+
+    private void initInnerTrinTwoData() {
+//        glColor3d(0.89, 0.78, 0.39);
+//            glVertex3f(0.01f, 0f, 0f);
+//            glVertex3f(0.22f, -0.08f, 0f);
+//            glVertex3f(0.2f, 0f, 0f);
+//            glVertex3f(0.22f, 0.08f, 0f);
+        innerTrinTwoData.put("x1", 0.1f);
+        innerTrinTwoData.put("y1", 0.0f);
+        innerTrinTwoData.put("x2", 0.22f);
+        innerTrinTwoData.put("y2", -0.8f);
+        innerTrinTwoData.put("x3", 0.2f);
+        innerTrinTwoData.put("y3", 0.0f);
+        innerTrinTwoData.put("x4", 0.22f);
+        innerTrinTwoData.put("y4", 0.08f);
+        innerTrinTwoData.put("degree", 45f);
+    }
+
+    private void initDotsData() {
+//         glColor3d(0.79, 0.58, 0.19);
+//            glVertex3f(0.24f, 0.087f, 0f);
+//            glVertex3f(0.25f, 0.097f, 0f);
+//            glVertex3f(0.24f, 0.107f, 0f);
+//            glVertex3f(0.23f, 0.097f, 0f);
+        dotsData.put("x1", 0.24f);
+        dotsData.put("y1", 0.087f);
+        dotsData.put("x2", 0.25f);
+        dotsData.put("y2", 0.097f);
+        dotsData.put("x3", 0.24f);
+        dotsData.put("y3", 0.107f);
+        dotsData.put("x4", 0.23f);
+        dotsData.put("y4", 0.097f);
 
     }
 }
