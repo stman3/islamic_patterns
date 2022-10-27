@@ -70,7 +70,7 @@ public class Animation1 {
         });
 
         // Get the thread stack and push a new frame
-        try ( MemoryStack stack = stackPush()) {
+        try (MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1); // int*
             IntBuffer pHeight = stack.mallocInt(1); // int*
 
@@ -134,7 +134,7 @@ public class Animation1 {
             for (int i = 0; i <= 360;) {
                 glRotatef(i, 0, 0, 1);
                 drawInnerTrinTwo();
-                
+
                 i += 45;
             }
             glPopMatrix();
@@ -209,12 +209,6 @@ public class Animation1 {
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents();
-            // time to wait before starting  the animation!
-
-            float secondsPassed = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - startTime);
-            if (secondsPassed < 5) {
-                continue;
-            }
 
             updateValues();
         }
@@ -225,7 +219,7 @@ public class Animation1 {
         updateInnerTrinOneData();
         scalingDownFactor = scalingDownFactor > 0.7f ? scalingDownFactor - 0.009f : scalingDownFactor;
         translateYFactor = translateYFactor < 0.3f ? translateYFactor + 0.009f : translateYFactor;
-                flippingDegree++;
+        flippingDegree++;
 
     }
 
@@ -251,13 +245,10 @@ public class Animation1 {
 
     private void updateInnerTrinOneData() {
         innerTrinOneData.forEach((key, v) -> {
-            if (key.equals("y1")) {
-                innerTrinOneData.put(key, v.floatValue() > -0.18f ? v - subtractValue : v);
-            } else if (key.equals("y3")) {
-                innerTrinOneData.put(key, v.floatValue() < 0.18f ? v + subtractValue : v);
+            if (key.equals("x4")) {
+                innerTrinOneData.put(key, v.floatValue() > -0.05f ? v - subtractValue : v);
             }
         });
-        System.out.println(innerTrinOneData);
     }
 
     //----------------------------------------------------------------------------------------
@@ -309,7 +300,7 @@ public class Animation1 {
 
     private void drawInnerTrinTwo() {
         glPushMatrix();
-        glRotatef(flippingDegree,0,0,1);
+        glRotatef(flippingDegree, 0, 0, 1);
         glBegin(GL_POLYGON);
         {
 
