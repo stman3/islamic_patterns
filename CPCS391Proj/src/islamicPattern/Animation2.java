@@ -16,11 +16,12 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Animation2 {
 
     // The window handle
-    private long window;
+    private long window; 
+    private float translate = 0.0f;
     private float innerRotateDegree = 0.0f;
     private float outerRotateDegree = 0.0f;
     private int phase = 1;
-    private float subtractValue = 0.0005f;
+    private float subtractValue = 0.0009f;
     private float scalingDownFactor = 1f;
     private float scaleUpFactor = 1f;
     private float translateYFactor = 0f;
@@ -128,7 +129,8 @@ public class Animation2 {
             float y3 = outerLineData.get("y3");
             float degree = outerLineData.get("degree");
             glRotatef(-outerRotateDegree, 0, 0, 1);
-
+            
+            if(phase == 3){glTranslatef(translate, 0, 0);}
             for (int i = 0; i <= 8; i++) {
                 glRotatef(i * degree, 0, 0, 1);
                 drawOuterLine(x1, y1, x2, y2, x3, y3);
@@ -164,7 +166,7 @@ public class Animation2 {
             float y4 = innerTrinOneData.get("y4");
             degree = innerTrinOneData.get("degree");
             glRotatef(innerRotateDegree, 0, 0, 1);
-
+            
             for (int i = 0; i <= 360;) {
                 glRotatef(i, 0, 0, 1);
                 drawInnerTrinOne(0.7f, 0, 0, x1, y1, x2, y2, x3, y3, x4, y4);
@@ -245,22 +247,21 @@ public class Animation2 {
             scaleUpFactor = scaleUpFactor < 1.6f ? scaleUpFactor + 0.0009f : scaleUpFactor;
             outerRotateDegree += 0.2f;
 
-
         } else if (phase == 2) {
             updateInnerTrinOneData();
             updateInnerTrinTwoData();
-            scalingDownFactor = scalingDownFactor > 0.0f ? scalingDownFactor - 0.002f : scalingDownFactor;
+            scalingDownFactor = scalingDownFactor > 0.0f ? scalingDownFactor - 0.004f : scalingDownFactor;
             innerRotateDegree += 0.2f;
-        } else if(phase == 3){
-            
+        } else if (phase == 3) {
+            shuriken();
         }
 
     }
 
     private void checkPhase() {
-        if (outerLineData.get("x2") > 0.48f && outerLineData.get("y1") < -0.03229f & phase == 1 ){
+        if (outerLineData.get("x2") > 0.48f && outerLineData.get("y1") < -0.03229f & phase == 1) {
             phase++;
-        } else if ( innerTrinTwoData.get("x4") < 0.015f && phase == 1 && phase == 2) {
+        } else if (innerTrinTwoData.get("x4") < 0.015f && phase == 2) {
             phase++;
         }
     }
@@ -301,10 +302,15 @@ public class Animation2 {
     private void updateDotsData() {
         dotsData.forEach((key, v) -> {
             if (key.equals("x2") || key.equals("x4") || key.equals("x1") || key.equals("x3")) {
-                dotsData.put(key, v.floatValue() < 0.3f ? v + subtractValue : v);
+                dotsData.put(key, v.floatValue() < 0.3699f ? v + subtractValue : v);
             }
         });
 
+    }
+
+    private void shuriken() {
+        outerRotateDegree += 2.0f;
+        innerRotateDegree -= 2.0f;
     }
 
     //----------------------------------------------------------------------------------------
