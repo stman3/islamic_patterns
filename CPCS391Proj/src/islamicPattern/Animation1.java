@@ -22,6 +22,7 @@ public class Animation1 {
     private float scalingDownFactor = 1f;
     private float translateYFactor = 0f;
     private float flippingDegree = 0f;
+    private boolean reverseAnimation = false;
     HashMap<String, Float> outerLineData = new HashMap<String, Float>();
     HashMap<String, Float> innerTrinOneData = new HashMap<String, Float>();
 
@@ -70,7 +71,7 @@ public class Animation1 {
         });
 
         // Get the thread stack and push a new frame
-        try (MemoryStack stack = stackPush()) {
+        try ( MemoryStack stack = stackPush()) {
             IntBuffer pWidth = stack.mallocInt(1); // int*
             IntBuffer pHeight = stack.mallocInt(1); // int*
 
@@ -209,7 +210,6 @@ public class Animation1 {
             // Poll for window events. The key callback above will only be
             // invoked during this call.
             glfwPollEvents();
-
             updateValues();
         }
     }
@@ -217,10 +217,41 @@ public class Animation1 {
     private void updateValues() {
         updateOuterLineData();
         updateInnerTrinOneData();
-        scalingDownFactor = scalingDownFactor > 0.7f ? scalingDownFactor - 0.009f : scalingDownFactor;
-        translateYFactor = translateYFactor < 0.3f ? translateYFactor + 0.009f : translateYFactor;
-        flippingDegree++;
+        updateTranslateYFactor();
+        updateScalingDownFactor();
+        updateFlippingDegree();
+        checkForReverse();
+    }
 
+    private void checkForReverse() {
+        if (scalingDownFactor <= 0.7f && translateYFactor >= 0.3f && outerLineData.get("degree") <= 0 && outerLineData.get("y1") <= -0.52f && outerLineData.get("y2") <= 0.05f) {
+            reverseAnimation = true;
+        } else if (scalingDownFactor >= 1f && translateYFactor <= 0f && outerLineData.get("degree") >= 45 && outerLineData.get("y1") >= 0.04f && outerLineData.get("y2") >= 0.12f && outerLineData.get("y3") >= 0.24f) {
+            reverseAnimation = false;
+        }
+        else{
+        System.out.printf("%f, %f %f %f %f %f %b\n", scalingDownFactor, translateYFactor,  outerLineData.get("degree"), outerLineData.get("y1"), outerLineData.get("y2"), outerLineData.get("y3"), reverseAnimation);
+        }
+    }
+
+    private void updateFlippingDegree() {
+        flippingDegree++;
+    }
+
+    private void updateScalingDownFactor() {
+        if (!reverseAnimation) {
+            scalingDownFactor = scalingDownFactor > 0.7f ? scalingDownFactor - 0.009f : scalingDownFactor;
+        } else {
+            scalingDownFactor = scalingDownFactor <= 1f ? scalingDownFactor + 0.009f : scalingDownFactor;
+        }
+    }
+
+    private void updateTranslateYFactor() {
+        if (!reverseAnimation) {
+            translateYFactor = translateYFactor < 0.3f ? translateYFactor + 0.009f : translateYFactor;
+        } else {
+            translateYFactor = translateYFactor >= 0f ? translateYFactor - 0.009f : translateYFactor;
+        }
     }
 
     private void scaleDownAndTranslate() {
@@ -232,13 +263,36 @@ public class Animation1 {
     private void updateOuterLineData() {
         outerLineData.forEach((key, v) -> {
             if (key.equals("x1") || key.equals("x2") || key.equals("x3")) {
-                outerLineData.put(key, v.floatValue() > 0f ? v - subtractValue : v);
+                if (!reverseAnimation) {
+                    outerLineData.put(key, v.floatValue() > 0f ? v - subtractValue : v);
+                } else if (reverseAnimation && key.equals("x1")) {
+                    outerLineData.put(key, v.floatValue() < 0.36f ? v + subtractValue : v);
+                } else if (reverseAnimation && key.equals("x2")) {
+                    outerLineData.put(key, v.floatValue() < 0.28f ? v + subtractValue : v);
+                } else if (reverseAnimation && key.equals("x3")) {
+                    outerLineData.put(key, v.floatValue() < 0.28f ? v + subtractValue : v);
+                }
             } else if (key.equals("y1")) {
-                outerLineData.put(key, v.floatValue() > -0.52f ? v - subtractValue : v);
+                if (!reverseAnimation) {
+                    outerLineData.put(key, v.floatValue() > -0.52f ? v - subtractValue : v);
+                } else {
+                    outerLineData.put(key, v.floatValue() < 0.04f ? v + subtractValue : v);
+                }
             } else if (key.equals("y2") || key.equals("y3")) {
-                outerLineData.put(key, v.floatValue() > 0.05f ? v - subtractValue : v);
+                if (!reverseAnimation) {
+                    outerLineData.put(key, v.floatValue() > 0.05f ? v - subtractValue : v);
+                } else if (reverseAnimation && key.equals("y2")) {
+                    outerLineData.put(key, v.floatValue() < 0.12f ? v + subtractValue : v);
+                } else if (key.equals("y3")) {
+                    outerLineData.put(key, v.floatValue() < 0.24f ? v + subtractValue : v);
+                }
             } else if (key.equals("degree")) {
-                outerLineData.put(key, v.floatValue() > 0 ? v - 0.2f : 0);
+                if (!reverseAnimation) {
+                    outerLineData.put(key, v.floatValue() > 0 ? v - 0.2f : 0);
+                } else {
+                    outerLineData.put(key, v.floatValue() < 45 ? v + 0.2f : 0);
+
+                }
             }
         });
     }
@@ -246,7 +300,11 @@ public class Animation1 {
     private void updateInnerTrinOneData() {
         innerTrinOneData.forEach((key, v) -> {
             if (key.equals("x4")) {
-                innerTrinOneData.put(key, v.floatValue() > -0.05f ? v - subtractValue : v);
+                if (!reverseAnimation) {
+                    innerTrinOneData.put(key, v.floatValue() > -0.05f ? v - subtractValue : v);
+                } else {
+                    innerTrinOneData.put(key, v.floatValue() <= 0.22f ? v + subtractValue : v);
+                }
             }
         });
     }
