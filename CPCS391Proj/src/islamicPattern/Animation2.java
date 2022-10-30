@@ -16,7 +16,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Animation2 {
 
     // The window handle
-    private long window; 
+    private long window;
+    private boolean reverse = false;
     private float translate = 0.0f;
     private float innerRotateDegree = 0.0f;
     private float outerRotateDegree = 0.0f;
@@ -129,8 +130,10 @@ public class Animation2 {
             float y3 = outerLineData.get("y3");
             float degree = outerLineData.get("degree");
             glRotatef(-outerRotateDegree, 0, 0, 1);
-            
-            if(phase == 3){glTranslatef(translate, 0, 0);}
+
+            if (phase == 3) {
+                glTranslatef(translate, 0, 0);
+            }
             for (int i = 0; i <= 8; i++) {
                 glRotatef(i * degree, 0, 0, 1);
                 drawOuterLine(x1, y1, x2, y2, x3, y3);
@@ -166,7 +169,7 @@ public class Animation2 {
             float y4 = innerTrinOneData.get("y4");
             degree = innerTrinOneData.get("degree");
             glRotatef(innerRotateDegree, 0, 0, 1);
-            
+
             for (int i = 0; i <= 360;) {
                 glRotatef(i, 0, 0, 1);
                 drawInnerTrinOne(0.7f, 0, 0, x1, y1, x2, y2, x3, y3, x4, y4);
@@ -211,7 +214,7 @@ public class Animation2 {
                     if ((incrmentshiftx < -0.7 || incrmentshifty < -0.8) || (incrmentshiftx > 0.7 || incrmentshifty > 0.8)) {
                         float shiftx = 0.0f + incrmentshiftx;
                         float shifty = 0.0f + incrmentshifty;
-                        //drawBackground(x, y, incrment, shiftx, shifty);
+                        drawBackground(x, y, incrment, shiftx, shifty);
                     }
                     incrmentshiftx += 0.283f;
 
@@ -254,6 +257,8 @@ public class Animation2 {
             innerRotateDegree += 0.2f;
         } else if (phase == 3) {
             shuriken();
+        } else if (phase == 4) {
+            phase4();
         }
 
     }
@@ -262,6 +267,8 @@ public class Animation2 {
         if (outerLineData.get("x2") > 0.48f && outerLineData.get("y1") < -0.03229f & phase == 1) {
             phase++;
         } else if (innerTrinTwoData.get("x4") < 0.015f && phase == 2) {
+            phase++;
+        } else if (outerRotateDegree > 390.0f) {
             phase++;
         }
     }
@@ -276,7 +283,6 @@ public class Animation2 {
 
             }
         });
-        System.out.println(outerLineData);
 
     }
 
@@ -313,6 +319,59 @@ public class Animation2 {
         innerRotateDegree -= 2.0f;
     }
 
+    private void phase4() {
+        if (outerRotateDegree > -45f) {
+            reverseInnerTrinOneData();
+            reverseInnerTrinTwoData();
+            scalingDownFactor = scalingDownFactor <= 1f ? scalingDownFactor + 0.0049f : scalingDownFactor;
+            outerRotateDegree -= 2.0f;
+            innerRotateDegree += 2.0f;
+        }else if(outerLineData.get("x2") <= 0.29f){
+            phase = 1;
+        }else{
+            reverseDotsData();
+            revrseOuterLineData();
+            scaleUpFactor = scaleUpFactor < 0.3f ? scaleUpFactor + 0.0009f : scaleUpFactor;
+
+        }
+    }
+        private void reverseInnerTrinOneData() {
+        innerTrinOneData.forEach((key, v) -> {
+            if (key.equals("x4")) {
+                innerTrinOneData.put(key, v.floatValue() <= 0.25f ? v + subtractValue : v);
+            }
+
+        });
+
+    }
+
+    private void reverseInnerTrinTwoData() {
+        innerTrinTwoData.forEach((key, v) -> {
+            if (key.equals("x4")) {
+                innerTrinTwoData.put(key, v.floatValue() <= 0.25f ? v + subtractValue : v);
+            }
+
+        });
+    }
+    private void reverseDotsData() {
+        dotsData.forEach((key, v) -> {
+            if (key.equals("x2") || key.equals("x4") || key.equals("x1") || key.equals("x3")) {
+                dotsData.put(key, v.floatValue() >= 0.22f ? v - subtractValue : v);
+            }
+        });
+
+    }
+        private void revrseOuterLineData() {
+        outerLineData.forEach((key, v) -> {
+            if (key.equals("x2")) {
+                outerLineData.put(key, v.floatValue() >= 0.29f ? v - subtractValue : v);
+            } else if (key.equals("y1")) {
+                outerLineData.put(key, v.floatValue() <= 0.04f ? v + subtractValue : v);
+
+            }
+        });
+
+    }
     //----------------------------------------------------------------------------------------
     private void drawOuterLine(float x1, float y1, float x2, float y2, float x3, float y3) {
         // create firs pattern ( outer)
