@@ -6,7 +6,6 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 import java.nio.*;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -18,10 +17,9 @@ public class Animation1 {
     // The window handle
     private long window;
     private float subtractValue = 0.0015f;
-    private long startTime = System.currentTimeMillis();
     private float scalingDownFactor = 1f;
     private float translateYFactor = 0f;
-    private float flippingDegree = 0f;
+    private float rotationgDegree = 0f;
     private boolean reverseAnimation = false;
     HashMap<String, Float> outerLineData = new HashMap<String, Float>();
     HashMap<String, Float> innerTrinOneData = new HashMap<String, Float>();
@@ -135,7 +133,6 @@ public class Animation1 {
             for (int i = 0; i <= 360;) {
                 glRotatef(i, 0, 0, 1);
                 drawInnerTrinTwo();
-
                 i += 45;
             }
             glPopMatrix();
@@ -152,7 +149,6 @@ public class Animation1 {
             y3 = innerTrinOneData.get("y3");
             float x4 = innerTrinOneData.get("x4");
             float y4 = innerTrinOneData.get("y4");
-            degree = innerTrinOneData.get("degree");
             for (int i = 0; i <= 360;) {
                 glRotatef(i, 0, 0, 1);
                 drawInnerTrinOne(0.7f, 0, 0, x1, y1, x2, y2, x3, y3, x4, y4);
@@ -219,23 +215,20 @@ public class Animation1 {
         updateInnerTrinOneData();
         updateTranslateYFactor();
         updateScalingDownFactor();
-        updateFlippingDegree();
+        updateRotationgDegree();
         checkForReverse();
     }
 
     private void checkForReverse() {
         if (scalingDownFactor <= 0.7f && translateYFactor >= 0.3f && outerLineData.get("degree") <= 0 && outerLineData.get("y1") <= -0.52f && outerLineData.get("y2") <= 0.05f) {
-            reverseAnimation = true;
+            reverseAnimation = false;
         } else if (scalingDownFactor >= 1f && translateYFactor <= 0f && outerLineData.get("degree") >= 45 && outerLineData.get("y1") >= 0.04f && outerLineData.get("y2") >= 0.12f && outerLineData.get("y3") >= 0.24f) {
             reverseAnimation = false;
         }
-        else{
-        System.out.printf("%f, %f %f %f %f %f %b\n", scalingDownFactor, translateYFactor,  outerLineData.get("degree"), outerLineData.get("y1"), outerLineData.get("y2"), outerLineData.get("y3"), reverseAnimation);
-        }
     }
 
-    private void updateFlippingDegree() {
-        flippingDegree++;
+    private void updateRotationgDegree() {
+        rotationgDegree++;
     }
 
     private void updateScalingDownFactor() {
@@ -257,10 +250,15 @@ public class Animation1 {
     private void scaleDownAndTranslate() {
         glScalef(scalingDownFactor, scalingDownFactor, 1f);
         glTranslatef(0, translateYFactor, 0);
+
     }
 
     //----------------------------------------
     private void updateOuterLineData() {
+        float[] oldFirstVertex = new float[]{outerLineData.get("x1"), outerLineData.get("y1"), 1};
+        float[] oldSecondVertex = new float[]{outerLineData.get("x2"), outerLineData.get("y2"), 1};
+        float[] oldThirdVertex = new float[]{outerLineData.get("x3"), outerLineData.get("y3"), 1};
+        float oldDegree = outerLineData.get("degree");
         outerLineData.forEach((key, v) -> {
             if (key.equals("x1") || key.equals("x2") || key.equals("x3")) {
                 if (!reverseAnimation) {
@@ -291,13 +289,21 @@ public class Animation1 {
                     outerLineData.put(key, v.floatValue() > 0 ? v - 0.2f : 0);
                 } else {
                     outerLineData.put(key, v.floatValue() < 45 ? v + 0.2f : 0);
-
                 }
             }
         });
+        float[] newFirstVertex = new float[]{outerLineData.get("x1"), outerLineData.get("y1"), 1};
+        float[] newSecondVertex = new float[]{outerLineData.get("x2"), outerLineData.get("y2"), 1};
+        float[] newThirdVertex = new float[]{outerLineData.get("x3"), outerLineData.get("y3"), 1};
+        float newDegree = outerLineData.get("degree");
+        printMatrix(constructTranslationRoatationMatrix(newFirstVertex[0] - oldFirstVertex[0], newFirstVertex[1] - oldFirstVertex[1], 0, newDegree - oldDegree), "outer lines x1, y1 translate & z rotation matrix");
+        printMatrix(constructTranslationRoatationMatrix(newSecondVertex[0] - oldSecondVertex[0], newSecondVertex[1] - oldSecondVertex[1], 0, newDegree - oldDegree), "outer lines x2, y2 translate & z rotation matrix");
+        printMatrix(constructTranslationRoatationMatrix(newThirdVertex[0] - oldSecondVertex[0], newThirdVertex[1] - oldThirdVertex[1], 0, newDegree - oldDegree), "outer lines x3, y3 translate & z rotation matrix");
     }
 
     private void updateInnerTrinOneData() {
+        float[] oldFourthVertex = new float[]{innerTrinOneData.get("x4"), innerTrinOneData.get("y4"), 1};
+
         innerTrinOneData.forEach((key, v) -> {
             if (key.equals("x4")) {
                 if (!reverseAnimation) {
@@ -307,6 +313,8 @@ public class Animation1 {
                 }
             }
         });
+        float[] newFourthVertex = new float[]{innerTrinOneData.get("x4"), innerTrinOneData.get("y4"), 1};
+        printMatrix(constructTranslationMatrix(oldFourthVertex[0] - newFourthVertex[0], 0f, 0f), "first Inner triangle x4 translate matrix");
     }
 
     //----------------------------------------------------------------------------------------
@@ -358,7 +366,7 @@ public class Animation1 {
 
     private void drawInnerTrinTwo() {
         glPushMatrix();
-        glRotatef(flippingDegree, 0, 0, 1);
+        glRotatef(rotationgDegree, 0, 0, 1);
         glBegin(GL_POLYGON);
         {
 
@@ -487,5 +495,24 @@ public class Animation1 {
         innerTrinOneData.put("x4", 0.22f);
         innerTrinOneData.put("y4", 0.0f);
         innerTrinOneData.put("degree", 45f);
+    }
+
+    private void printMatrix(float[] matrix, String label) {
+        System.out.println("---------------------------------------");
+        System.out.println(label);
+        System.out.println("---------------------------------------");
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 4; col++) {
+                System.out.printf("%7.4f%c", matrix[row + col * 4], col == 3 ? '\n' : ' ');
+            }
+        }
+    }
+
+    private float[] constructTranslationRoatationMatrix(float tx, float ty, float tz, float degree) {
+        return new float[]{(float) Math.cos(degree), (float) Math.cos(degree), 0, 0, (float) -Math.sin(degree), (float) Math.cos(degree), 0, 0, 0, 0, 0, 1f, tx, ty, tz, 1f};
+    }
+
+    private float[] constructTranslationMatrix(float tx, float ty, float tz) {
+        return new float[]{1f, 0, 0, 0, 0, 1f, 0, 0, 0, 0, 0, 1f, tx, ty, tz, 1f};
     }
 }
