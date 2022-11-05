@@ -221,7 +221,7 @@ public class Animation1 {
 
     private void checkForReverse() {
         if (scalingDownFactor <= 0.7f && translateYFactor >= 0.3f && outerLineData.get("degree") <= 0 && outerLineData.get("y1") <= -0.52f && outerLineData.get("y2") <= 0.05f) {
-            reverseAnimation = false;
+            reverseAnimation = true;
         } else if (scalingDownFactor >= 1f && translateYFactor <= 0f && outerLineData.get("degree") >= 45 && outerLineData.get("y1") >= 0.04f && outerLineData.get("y2") >= 0.12f && outerLineData.get("y3") >= 0.24f) {
             reverseAnimation = false;
         }
