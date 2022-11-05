@@ -17,7 +17,6 @@ public class Animation2 {
 
     // The window handle
     private long window;
-    private boolean reverse = false;
     private float translate = 0.0f;
     private float innerRotateDegree = 0.0f;
     private float outerRotateDegree = 0.0f;
@@ -25,7 +24,6 @@ public class Animation2 {
     private float subtractValue = 0.0009f;
     private float scalingDownFactor = 1f;
     private float scaleUpFactor = 1f;
-    private float translateYFactor = 0f;
     private float flippingDegree = 0f;
     HashMap<String, Float> outerLineData = new HashMap<String, Float>();
     HashMap<String, Float> innerTrinOneData = new HashMap<String, Float>();
@@ -146,6 +144,9 @@ public class Animation2 {
             glScaled(1.3, 1.3, 1);
             glRotatef(-innerRotateDegree, 0, 0, 1);
             glScalef(scalingDownFactor, scalingDownFactor, 0);
+            float[] matrix = new float[16];
+            glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+            printMatrix(matrix, "Scaling and rotation of second inner triangle");
             for (int i = 0; i <= 360;) {
                 glRotatef(i, 0, 0, 1);
                 drawInnerTrinTwo();
@@ -158,7 +159,6 @@ public class Animation2 {
             glPushMatrix();
             glScaled(1.3, 1.3, 1);
 
-            // scaleDownAndTranslate();
             x1 = innerTrinOneData.get("x1");
             y1 = innerTrinOneData.get("y1");
             x2 = innerTrinOneData.get("x2");
@@ -180,7 +180,6 @@ public class Animation2 {
             glLoadIdentity();
             glPushMatrix();
             glScaled(1.3, 1.3, 1);
-            //  scaleDownAndTranslate();
             x1 = dotsData.get("x1");
             y1 = dotsData.get("y1");
             x2 = dotsData.get("x2");
@@ -214,7 +213,7 @@ public class Animation2 {
                     if ((incrmentshiftx < -0.7 || incrmentshifty < -0.8) || (incrmentshiftx > 0.7 || incrmentshifty > 0.8)) {
                         float shiftx = 0.0f + incrmentshiftx;
                         float shifty = 0.0f + incrmentshifty;
-                        drawBackground(x, y, incrment, shiftx, shifty);
+                        //    drawBackground(x, y, incrment, shiftx, shifty);
                     }
                     incrmentshiftx += 0.283f;
 
@@ -246,7 +245,7 @@ public class Animation2 {
         checkPhase();
         if (phase == 1) {
             updateOuterLineData();
-            updateDotsData();
+            //updateDotsData();
             scaleUpFactor = scaleUpFactor < 1.6f ? scaleUpFactor + 0.0009f : scaleUpFactor;
             outerRotateDegree += 0.2f;
 
@@ -275,6 +274,7 @@ public class Animation2 {
 
     //----------------------------------------
     private void updateOuterLineData() {
+
         outerLineData.forEach((key, v) -> {
             if (key.equals("x2")) {
                 outerLineData.put(key, v.floatValue() < 0.48f ? v + subtractValue : v);
@@ -287,6 +287,7 @@ public class Animation2 {
     }
 
     private void updateInnerTrinOneData() {
+
         innerTrinOneData.forEach((key, v) -> {
             if (key.equals("x4")) {
                 innerTrinOneData.put(key, v.floatValue() > 0.015f ? v - subtractValue : v);
@@ -297,19 +298,12 @@ public class Animation2 {
     }
 
     private void updateInnerTrinTwoData() {
+
         innerTrinTwoData.forEach((key, v) -> {
             if (key.equals("x4")) {
                 innerTrinTwoData.put(key, v.floatValue() > 0.015f ? v - subtractValue : v);
             }
 
-        });
-    }
-
-    private void updateDotsData() {
-        dotsData.forEach((key, v) -> {
-            if (key.equals("x2") || key.equals("x4") || key.equals("x1") || key.equals("x3")) {
-                dotsData.put(key, v.floatValue() < 0.3699f ? v + subtractValue : v);
-            }
         });
 
     }
@@ -326,42 +320,48 @@ public class Animation2 {
             scalingDownFactor = scalingDownFactor <= 1f ? scalingDownFactor + 0.0049f : scalingDownFactor;
             outerRotateDegree -= 2.0f;
             innerRotateDegree += 2.0f;
-        }else if(outerLineData.get("x2") <= 0.29f){
+        } else if (outerLineData.get("x2") <= 0.29f) {
             phase = 1;
-        }else{
-            reverseDotsData();
+        } else {
+
             revrseOuterLineData();
             scaleUpFactor = scaleUpFactor < 0.3f ? scaleUpFactor + 0.0009f : scaleUpFactor;
 
         }
     }
-        private void reverseInnerTrinOneData() {
+
+    private void reverseInnerTrinOneData() {
+        float[] oldFourthVertex = new float[]{innerTrinOneData.get("x4"), innerTrinOneData.get("y4"), 1};
+
         innerTrinOneData.forEach((key, v) -> {
             if (key.equals("x4")) {
                 innerTrinOneData.put(key, v.floatValue() <= 0.25f ? v + subtractValue : v);
             }
 
         });
+        float[] newFourthVertex = new float[]{innerTrinOneData.get("x4"), innerTrinOneData.get("y4"), 1};
+        printMatrix(constructTranslationMatrix(oldFourthVertex[0] - newFourthVertex[0], 0f, 0f), "first Inner triangle x4 translate matrix");
 
     }
 
     private void reverseInnerTrinTwoData() {
+        float[] oldFourthVertex = new float[]{innerTrinTwoData.get("x4"), innerTrinTwoData.get("y4"), 1};
+
         innerTrinTwoData.forEach((key, v) -> {
             if (key.equals("x4")) {
                 innerTrinTwoData.put(key, v.floatValue() <= 0.25f ? v + subtractValue : v);
             }
 
         });
-    }
-    private void reverseDotsData() {
-        dotsData.forEach((key, v) -> {
-            if (key.equals("x2") || key.equals("x4") || key.equals("x1") || key.equals("x3")) {
-                dotsData.put(key, v.floatValue() >= 0.22f ? v - subtractValue : v);
-            }
-        });
+        float[] newFourthVertex = new float[]{innerTrinTwoData.get("x4"), innerTrinTwoData.get("y4"), 1};
+        printMatrix(constructTranslationMatrix(newFourthVertex[0] - oldFourthVertex[0], 0f, 0f), "second Inner triangle x4 translate matrix");
 
     }
-        private void revrseOuterLineData() {
+
+    private void revrseOuterLineData() {
+        float[] oldFirstVertex = new float[]{outerLineData.get("x1"), outerLineData.get("y1"), 1};
+        float[] oldSecondVertex = new float[]{outerLineData.get("x2"), outerLineData.get("y2"), 1};
+        float oldDegree = outerLineData.get("degree");
         outerLineData.forEach((key, v) -> {
             if (key.equals("x2")) {
                 outerLineData.put(key, v.floatValue() >= 0.29f ? v - subtractValue : v);
@@ -369,9 +369,35 @@ public class Animation2 {
                 outerLineData.put(key, v.floatValue() <= 0.04f ? v + subtractValue : v);
 
             }
+
         });
+        float[] newFirstVertex = new float[]{outerLineData.get("x1"), outerLineData.get("y1"), 1};
+        float[] newSecondVertex = new float[]{outerLineData.get("x2"), outerLineData.get("y2"), 1};
+        float newDegree = outerLineData.get("degree");
+        printMatrix(constructTranslationRoatationMatrix(newFirstVertex[0] - oldFirstVertex[0], newFirstVertex[1] - oldFirstVertex[1], 0, newDegree - oldDegree), "outer lines x1, y1 translate & z rotation matrix");
+        printMatrix(constructTranslationRoatationMatrix(newSecondVertex[0] - oldSecondVertex[0], newSecondVertex[1] - oldSecondVertex[1], 0, newDegree - oldDegree), "outer lines x2, y2 translate & z rotation matrix");
 
     }
+
+    private void printMatrix(float[] matrix, String label) {
+        System.out.println("---------------------------------------");
+        System.out.println(label);
+        System.out.println("---------------------------------------");
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 4; col++) {
+                System.out.printf("%7.4f%c", matrix[row + col * 4], col == 3 ? '\n' : ' ');
+            }
+        }
+    }
+
+    private float[] constructTranslationRoatationMatrix(float tx, float ty, float tz, float degree) {
+        return new float[]{(float) Math.cos(degree), (float) Math.cos(degree), 0, 0, (float) -Math.sin(degree), (float) Math.cos(degree), 0, 0, 0, 0, 0, 1f, tx, ty, tz, 1f};
+    }
+
+    private float[] constructTranslationMatrix(float tx, float ty, float tz) {
+        return new float[]{1f, 0, 0, 0, 0, 1f, 0, 0, 0, 0, 0, 1f, tx, ty, tz, 1f};
+    }
+
     //----------------------------------------------------------------------------------------
     private void drawOuterLine(float x1, float y1, float x2, float y2, float x3, float y3) {
         // create firs pattern ( outer)
