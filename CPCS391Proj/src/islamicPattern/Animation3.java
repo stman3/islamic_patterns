@@ -28,6 +28,7 @@ public class Animation3 {
     HashMap<String, Float> outerLineData = new HashMap<String, Float>();
     HashMap<String, Float> innerTrinOneData = new HashMap<String, Float>();
 
+    //-------------------------------------------------------------------------
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
@@ -44,6 +45,7 @@ public class Animation3 {
         glfwSetErrorCallback(null).free();
     }
 
+    //-------------------------------------------------------------------------
     private void init() {
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
@@ -100,6 +102,7 @@ public class Animation3 {
         glfwShowWindow(window);
     }
 
+    //-------------------------------------------------------------------------
     private void loop() {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
@@ -126,19 +129,21 @@ public class Animation3 {
             float degree = outerLineData.get("degree");
             for (int i = 0; i <= 8; i++) {
                 glRotatef(i * degree, 0, 0, 1);
-                drawOuterLine(x1, y1, x2 , y2, x3, y3);
+                drawOuterLine(x1, y1, x2, y2, x3, y3);
             }
-            if(locTrin > 0.18f)
+            if (locTrin > 0.18f) {
                 revLine = true;
-            if(locTrin <= 0.0f)
-                revLine  =false;
-            if(revLine == true){
+            }
+            if (locTrin <= 0.0f) {
+                revLine = false;
+            }
+            if (revLine == true) {
                 locTrin -= 0.001;
-            }else{
+            } else {
                 locTrin += 0.001;
             }
             glPopMatrix();
-            
+
             //-------------------------------------------
             glLoadIdentity();
             glPushMatrix();
@@ -191,7 +196,6 @@ public class Animation3 {
                 float x = 0.09f;
                 float y = 0.09f;
                 float incrment = 0.05f;
-
                 for (int j = 0; j < countStars; j++) {
                     if ((incrmentshiftx < -0.7 || incrmentshifty < -0.8) || (incrmentshiftx > 0.7 || incrmentshifty > 0.8)) {
                         float shiftx = 0.0f + incrmentshiftx;
@@ -199,11 +203,14 @@ public class Animation3 {
                         drawBackground(x, y, incrment, shiftx, shifty);
                     }
                     incrmentshiftx += 0.283f;
-
+                    System.out.println("Stars Background Translation for x");
+                    printTransMatrix(incrmentshiftx,incrmentshifty);
                 }
 
                 incrmentshiftx = -0.845f;
                 incrmentshifty += 0.283f;
+                System.out.println("Stars Background Translation for y ");
+                printTransMatrix(incrmentshiftx,incrmentshifty);
 
             }
             countStars += 0.01f;
@@ -227,7 +234,6 @@ public class Animation3 {
                         drawBackground(x, y, incrment, shiftx, shifty);
                     }
                     incrmentshiftxRev -= 0.283f;
-
                 }
 
                 incrmentshiftxRev = 0.845f;
@@ -256,32 +262,36 @@ public class Animation3 {
         }
     }
 
-    //----------------------------------------
-    //----------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     private void drawOuterLine(float x1, float y1, float x2, float y2, float x3, float y3) {
-        // create firs pattern ( outer )
+        // create first pattern ( outer )
         glLineWidth(4);
         glPushMatrix();
         glRotatef(flippingDegree, 0, 1, 1);
-
+        System.out.println("Rotating Arrow Lines");
+        printMatrix();
         glBegin(GL_LINE_STRIP);
         {
             glColor3d(0.89, 0.68, 0.29);
-            glVertex3f(x1+locTrin, y1, 0f);
-            glVertex3f(x2+locTrin, y2, 0f);
-            glVertex3f(x3+locTrin, y3, 0f);
+            glVertex3f(x1 + locTrin, y1, 0f);
+            glVertex3f(x2 + locTrin, y2, 0f);
+            glVertex3f(x3 + locTrin, y3, 0f);
 
         }
         glEnd();
+        System.out.println("Translation Manually not using gl");
+        printTransMatrix(locTrin,locTrin);
         glPopMatrix();
     }
-    //----------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
 
-    private void drawInnerTrinOne(float red, float green, float blue, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+    private void drawInnerTrinOne(float red, float green, float blue, float x1, float y1, float x2,
+            float y2, float x3, float y3, float x4, float y4) {
         glPushMatrix();
         if (y1 > -0.18f && y3 < 0.18f) {
             glRotatef(0, 0, 0, 360);
         }
+        // x and y 
         glRotatef(flippingDegree, 1, 1, 0);
         glBegin(GL_POLYGON);
         {
@@ -304,13 +314,15 @@ public class Animation3 {
         glEnd();
         glPopMatrix();
     }
-    //----------------------------------------------------------------------------------------
 
+    //-------------------------------------------------------------------------
     private void drawInnerTrinTwo() {
         glPushMatrix();
         float xRef = 1f;
         float yRef = 1f;
         glRotatef(flippingDegree, 1, 1, 0);
+        System.out.println("Rotating Inner polygons first and Second");
+        printMatrix();
         glBegin(GL_POLYGON);
         {
 
@@ -333,8 +345,8 @@ public class Animation3 {
         glEnd();
         glPopMatrix();
     }
-    //----------------------------------------------------------------------------------------
 
+    //-------------------------------------------------------------------------
     private void drawDots() {
         glPushMatrix();
 
@@ -361,8 +373,8 @@ public class Animation3 {
         glEnd();
         glPopMatrix();
     }
-    //----------------------------------------------------------------------------------------
 
+    //-------------------------------------------------------------------------
     private void drawBackground(float x, float y, float incrment, float shiftx, float shifty) {
         glLineWidth(3f);
         glColor3d(0.79, 0.68, 0.29);
@@ -400,7 +412,7 @@ public class Animation3 {
 
     }
 
-    //----------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     private void drawBackBox() {
         glLineWidth(4f);
         glPushMatrix();
@@ -419,14 +431,46 @@ public class Animation3 {
         glPopMatrix();
     }
 
+    //-------------------------------------------------------------------------
     private void updateFlippingDeg() {
         flippingDegree += 0.55;
     }
 
-    public static void main(String[] args) {
-        new Animation3().run();
+    //-------------------------------------------------------------------------
+    private void printMatrix() {
+        System.out.println("---------------------------------------");
+        double[] matrix = new double[16];
+        glGetDoublev(GL_MODELVIEW_MATRIX, matrix);
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 4; col++) {
+                System.out.printf("%7.3f%c", matrix[row + col * 4], col == 3 ? '\n' : ' ');
+            }
+        }
+        System.out.println("---------------------------------------");
     }
 
+    //------------------------------------------------------------------------
+    private void printTransMatrix(float tx, float ty) {
+        System.out.println("---------------------------------------");
+        for (int row = 0; row < 4; row++) {
+            for (int col = 0; col < 4; col++) {
+                if ((row == 0) && col == 3) {
+                    System.out.printf("%7.4f%c", tx, col == 3 ? '\n' : ' ');
+                } else if (row == 1 && col == 3) {
+                    System.out.printf("%7.4f%c", ty, col == 3 ? '\n' : ' ');
+
+                } else if (row == col) {
+                    System.out.printf("%7.4f%c", 1f, col == 3 ? '\n' : ' ');
+                } else {
+                    System.out.printf("%7.4f%c", 0f, col == 3 ? '\n' : ' ');
+                }
+            }
+        }
+        System.out.println("---------------------------------------");
+    }
+    //------------------------------------------------------------------------
+
+    //-------------------------------------------------------------------------         
     private void initOuterLineData() {
         outerLineData.put("x1", 0.36f);
         outerLineData.put("y1", 0.04f);
@@ -437,6 +481,7 @@ public class Animation3 {
         outerLineData.put("degree", 45f);
     }
 
+    //-------------------------------------------------------------------------
     private void initInnerTrinOneData() {
         innerTrinOneData.put("x1", 0.25f);
         innerTrinOneData.put("y1", -0.08f);
@@ -447,5 +492,10 @@ public class Animation3 {
         innerTrinOneData.put("x4", 0.22f);
         innerTrinOneData.put("y4", 0.0f);
         innerTrinOneData.put("degree", 45f);
+    }
+
+    //-------------------------------------------------------------------------
+    public static void main(String[] args) {
+        new Animation3().run();
     }
 }
