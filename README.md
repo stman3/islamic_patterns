@@ -19,6 +19,7 @@ This place has been referenced in many movies and comics like Aladdin. Because o
 # Drawing using LWJGL
 ___________________________________________________________________________________________________________________________________________________________
 Since we are computer science students with no taste In drawing, our best solution is to find an Islamic pattern and using it as a reference to draw it using Java language.
+
 <img width="477" alt="Screenshot 1444-04-15 at 9 25 14 AM" src="https://user-images.githubusercontent.com/75269916/200755545-fd0e120b-28bb-46f3-ac0f-4a8d4d0b11d9.png">
 Figure 4. Islamic Pattern Reference
 
