@@ -214,7 +214,7 @@ public class Animation3 {
 
             }
             countStars += 0.01f;
-            if (countStars > 6.0) {
+            if (countStars > 7.0) {
                 countStars = 0.0f;
             }
             glPopMatrix();
