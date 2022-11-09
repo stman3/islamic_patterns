@@ -62,6 +62,20 @@ Figure 11. Outer Polygon circle
 <img width="355" alt="Screenshot 1444-04-15 at 9 29 39 AM" src="https://user-images.githubusercontent.com/75269916/200757990-eaa01c7e-737e-4a04-850d-9616b272408e.png">
 Figure 12. Repeat Outer Polygon Code
 
+# Drawing using LWJGL ( Inner Triangle )
+___________________________________________________________________________________________________________________________________________________________
+<img width="355" alt="Screenshot 1444-04-15 at 9 29 48 AM" src="https://user-images.githubusercontent.com/75269916/200758519-d5e34ab2-c601-4108-983e-13f1f9be3b3a.png">
+Figure 13. Inner Triangle Code
+
+<img width="355" alt="Screenshot 1444-04-15 at 9 29 57 AM" src="https://user-images.githubusercontent.com/75269916/200758533-b2a57912-3143-45cb-9f98-7cef3a9a6b5c.png">
+Figure 14. First Inner Triangle
+
+<img width="355" alt="Screenshot 1444-04-15 at 9 30 02 AM" src="https://user-images.githubusercontent.com/75269916/200758538-3ba30fc7-82ef-407d-920b-0ead11d96851.png">
+Figure 15. Repeating Inner Triangle Code
+
+<img width="355" alt="Screenshot 1444-04-15 at 9 30 06 AM" src="https://user-images.githubusercontent.com/75269916/200758551-b2e449dc-a1bd-4bf5-ac34-421598b79657.png">
+Figure 16. Inner Triangle circle
+
 # Drawing using LWJGL ( Dots )
 ___________________________________________________________________________________________________________________________________________________________
 
